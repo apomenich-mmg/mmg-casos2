@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMG · Casos de Éxito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --lima:#DCFE6F;
+  --metrix:#307FE2;
+  --forma:#FE5000;
+  --moov:#E0004D;
+  --vou:#DCFE6F;
+  --bg:#FFFFFF;
+  --bg2:#F7F7F5;
+  --border:#E5E5E2;
+  --border2:#D0D0CC;
+  --text:#0A0A0A;
+  --text2:#555550;
+  --text3:#999990;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1.5px solid var(--text);padding-bottom:12px;margin-bottom:1.75rem}
+.brand-word{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.1em;color:var(--text);line-height:1}
+.brand-sub{font-size:10px;letter-spacing:0.18em;color:var(--text2);text-transform:uppercase;margin-top:3px}
+.count-pill{background:var(--lima);color:#000;font-size:11px;font-weight:500;padding:4px 13px;border-radius:99px}
+.loading{text-align:center;padding:3rem;font-size:13px;color:var(--text2)}
+.error-msg{background:#FFF0F0;border:0.5px solid #FFB0B0;border-radius:8px;padding:12px 16px;font-size:12px;color:#900;margin-bottom:1rem}
+.filter-block{margin-bottom:10px;display:flex;align-items:flex-start;gap:10px}
+.filter-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);padding-top:7px;min-width:60px;flex-shrink:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;font-weight:500;padding:5px 13px;border-radius:99px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all 0.12s;line-height:1.2;font-family:'DM Sans',sans-serif}
+.chip:hover{border-color:var(--text);color:var(--text)}
+.search-row{margin:14px 0 1.5rem;position:relative}
+.search-row svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;pointer-events:none;color:var(--text3)}
+.search-row input{width:100%;padding:9px 14px 9px 36px;font-size:13px;font-family:'DM Sans',sans-serif;border-radius:8px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text);outline:none}
+.search-row input:focus{border-color:var(--text)}
+.cases{display:flex;flex-direction:column;gap:6px}
+.case-card{border:0.5px solid var(--border);border-radius:10px;background:var(--bg);overflow:hidden;transition:border-color 0.12s}
+.case-card:hover{border-color:var(--border2)}
+.case-main{display:grid;grid-template-columns:4px 1fr auto;align-items:center;gap:14px;padding:13px 16px;cursor:pointer}
+.accent{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0}
+.a-Metrix{background:var(--metrix)}.a-Forma{background:var(--forma)}.a-Moov{background:var(--moov)}.a-Vou{background:var(--vou)}
+.case-body{min-width:0}
+.case-client{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:2px;display:flex;align-items:center;gap:7px;line-height:1.1}
+.case-name{font-size:13px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.t-Metrix{background:#DCEEFF;color:#0C447C}.t-Forma{background:#FDECD8;color:#8A3A04}.t-Moov{background:#FFD6E3;color:#7A0025}.t-Vou{background:#EEFAD0;color:#3D6500}
+.t-svc{background:var(--bg2);color:var(--text2)}
+.case-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.btn-res{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:5px 11px;border-radius:6px;border:0.5px solid var(--border2);color:var(--text2);background:transparent;cursor:pointer;transition:all 0.12s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.btn-res:hover{background:var(--lima);border-color:var(--lima);color:#000}
+.btn-ppt{border-color:var(--text);color:var(--text)}
+.chev{width:16px;height:16px;flex-shrink:0;color:var(--text3);transition:transform 0.15s}
+.chev.open{transform:rotate(180deg)}
+.case-detail{display:none;padding:14px 16px 18px 34px;border-top:0.5px solid var(--border);background:var(--bg2)}
+.case-detail.open{display:block}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin-bottom:14px}
+.dl{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.dv{font-size:13px;color:var(--text)}
+.detail-links{display:flex;gap:8px;flex-wrap:wrap}
+.lnk{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:6px 14px;border-radius:6px;border:0.5px solid var(--border2);color:var(--text);background:var(--bg);cursor:pointer;transition:all 0.12s;font-family:'DM Sans',sans-serif}
+.lnk:hover{background:var(--lima);border-color:var(--lima);color:#000}
+.lnk-ppt{border-color:var(--text)}
+.no-res-txt{font-size:12px;color:var(--text3)}
+.empty{padding:3rem;text-align:center;font-size:13px;color:var(--text2)}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{text-align:center;width:320px}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.12em;margin-bottom:4px}
+.login-sub{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--text2);margin-bottom:32px}
+.login-box input{width:100%;padding:10px 14px;font-size:14px;font-family:'DM Sans',sans-serif;border:1px solid var(--border2);border-radius:8px;outline:none;margin-bottom:10px;text-align:center;letter-spacing:0.12em}
+.login-box input:focus{border-color:var(--text)}
+.login-btn{width:100%;padding:10px;background:#000;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;border-radius:8px;cursor:pointer;transition:background 0.12s}
+.login-btn:hover{background:#222}
+.login-err{font-size:12px;color:#E0004D;margin-top:8px;min-height:18px}
+.login-box input[type=password]{-webkit-text-security:disc}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">MMG</div>
+    <div class="login-sub">Casos de Éxito</div>
+    <input type="password" id="pwd-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkPwd()">
+    <button class="login-btn" onclick="checkPwd()">Ingresar</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- BOARD -->
+<div class="wrap" id="board" style="display:none">
+  <div class="topbar">
+    <div>
+      <div class="brand-word">MMG</div>
+      <div class="brand-sub">Casos de Éxito</div>
+    </div>
+    <span class="count-pill" id="count-lbl">Cargando…</span>
+  </div>
+
+  <div id="filter-area" style="display:none">
+    <div class="filter-block">
+      <span class="filter-label">Área</span>
+      <div class="chips" id="c-area">
+        <button class="chip" data-val="" data-group="area" onclick="toggleChip(this)">Todas</button>
+        <button class="chip" data-val="Metrix" data-group="area" onclick="toggleChip(this)">Metrix</button>
+        <button class="chip" data-val="Forma" data-group="area" onclick="toggleChip(this)">Forma</button>
+        <button class="chip" data-val="Moov" data-group="area" onclick="toggleChip(this)">Moov</button>
+        <button class="chip" data-val="Vou" data-group="area" onclick="toggleChip(this)">Vou</button>
+      </div>
+    </div>
+    <div class="filter-block">
+      <span class="filter-label">Industria</span>
+      <div class="chips" id="c-ind"></div>
+    </div>
+    <div class="filter-block">
+      <span class="filter-label">Servicio</span>
+      <div class="chips" id="c-svc"></div>
+    </div>
+    <div class="search-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      <input type="text" id="q" placeholder="Buscar por cliente, caso o industria…" oninput="render()">
+    </div>
+  </div>
+
+  <div id="cases-wrap">
+    <div class="loading">Cargando casos…</div>
+  </div>
+</div>
+
+<script>
+// ─── CONTRASEÑA ───────────────────────────────────────────────
+// Cambiá este valor por la contraseña que quieras
+const PASSWORD = 'mmg2024';
+
+function checkPwd(){
+  const v = document.getElementById('pwd-input').value;
+  if(v === PASSWORD){
+    sessionStorage.setItem('mmg_auth','1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('board').style.display='block';
+    loadData();
+  } else {
+    document.getElementById('login-err').textContent='Contraseña incorrecta.';
+    document.getElementById('pwd-input').value='';
+  }
+}
+
+// Auto-login si ya autenticó en esta sesión
+if(sessionStorage.getItem('mmg_auth')==='1'){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('board').style.display='block';
+}
+
+// ─── CSV URL ──────────────────────────────────────────────────
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnYUb4xmdEc3-mhSEwQ6eVPy5fVAvNfka6LkncVyrsokFffhzw5lJQeB6Q-DTjTLJzh1Fjrj0ZdzUu/pub?output=csv';
+
+// ─── CSV PARSER ───────────────────────────────────────────────
+function parseCSV(text){
+  const lines = text.split(/\r?\n/);
+  const headers = parseLine(lines[0]);
+  console.log('[MMG] Headers:', headers);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    if(!lines[i].trim()) continue;
+    const vals = parseLine(lines[i]);
+    const obj = { _vals: vals };
+    headers.forEach((h,j) => obj[h.trim()] = (vals[j]||'').trim());
+    rows.push(obj);
+  }
+  console.log('[MMG] First 3 rows (raw vals):', rows.slice(0,3).map(r=>r._vals));
+  return rows;
+}
+
+function parseLine(line){
+  const result=[], re=/("(?:[^"]|"")*"|[^,]*)/g;
+  let m;
+  while((m=re.exec(line))!==null){
+    if(m.index===re.lastIndex) re.lastIndex++;
+    let v=m[1];
+    if(v.startsWith('"')&&v.endsWith('"')) v=v.slice(1,-1).replace(/""/g,'"');
+    result.push(v);
+  }
+  return result;
+}
+
+// ─── DATA ─────────────────────────────────────────────────────
+let DATA = [];
+const SEL = {area:new Set(),ind:new Set(),svc:new Set()};
+let openIdx = null;
+
+const AREA_COLORS = {Metrix:'#307FE2',Forma:'#FE5000',Moov:'#E0004D',Vou:'#DCFE6F'};
+const AREA_TEXT   = {Metrix:'#fff',Forma:'#fff',Moov:'#fff',Vou:'#000'};
+const SVC_KEYWORDS = ['SEO','SEM','Analytics','CRO','Desarrollo Web','Audiovisual','CRM','Diseño','Influencer','RRSS','Planning','MELI','Social Listening'];
+
+async function loadData(){
+  try{
+    const resp = await fetch(CSV_URL);
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const text = await resp.text();
+    const rows = parseCSV(text);
+
+    // Column indices (0-based):
+    // 0:Área 1:Servicio 2:Cliente 3:Industria 4:B2B/B2C 5:Nombre del Caso
+    // 6:PRIVADO 7:Tier 8:Ppt-One Page 9:URL 10:Artículo Blog 11:Fecha de publicación
+    DATA = rows
+      .filter(r => (r._vals && (r._vals[0]||'').trim() !== ''))
+      .map(r => {
+        const v = r._vals;
+
+        // URL (one page) — index 9
+        let ppt = (v[9]||'').trim();
+        if(ppt && !ppt.startsWith('http')) ppt = '';
+
+        // Artículo Blog — index 10
+        let blog = (v[10]||'').trim();
+        if(['NA','N/A','na'].includes(blog) || (blog && !blog.startsWith('http'))) blog = '';
+
+        // PRIVADO — index 6, strip accents safely
+        const privRaw = (v[6]||'').trim().normalize('NFKD').replace(/[̀-ͯ]/g,'').toUpperCase();
+        const privado = privRaw === 'SI' || privRaw === 'TRUE';
+
+        return {
+          area:      (v[0]||'').trim(),
+          servicio:  (v[1]||'').trim(),
+          cliente:   (v[2]||'').trim(),
+          industria: (v[3]||'').trim(),
+          nombre:    (v[5]||'').trim(),
+          fecha:     (v[11]||'').trim(),
+          privado, blog, ppt
+        };
+      });
+
+    // Build dynamic filter chips
+    buildChips();
+    document.getElementById('filter-area').style.display='block';
+    document.getElementById('cases-wrap').innerHTML='<div class="cases" id="cases"></div>';
+    render();
+  } catch(e){
+    document.getElementById('cases-wrap').innerHTML=
+      '<div class="error-msg">Error al cargar los datos: '+e.message+'<br>Verificá que el CSV esté publicado correctamente.</div>';
+    document.getElementById('count-lbl').textContent='Error';
+  }
+}
+
+function buildChips(){
+  const inds = [...new Set(DATA.map(d=>d.industria.split(',')[0].trim()).filter(Boolean))].sort();
+  const svcs = SVC_KEYWORDS;
+
+  const indEl = document.getElementById('c-ind');
+  indEl.innerHTML='<button class="chip" data-val="" data-group="ind" onclick="toggleChip(this)">Todas</button>';
+  inds.forEach(i=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.dataset.val=i; b.dataset.group='ind';
+    b.textContent=i; b.onclick=function(){toggleChip(this)};
+    indEl.appendChild(b);
+  });
+
+  const svcEl = document.getElementById('c-svc');
+  svcEl.innerHTML='<button class="chip" data-val="" data-group="svc" onclick="toggleChip(this)">Todos</button>';
+  svcs.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.dataset.val=s; b.dataset.group='svc';
+    b.textContent=s; b.onclick=function(){toggleChip(this)};
+    svcEl.appendChild(b);
+  });
+}
+
+function toggleChip(el){
+  const group=el.dataset.group, val=el.dataset.val, set=SEL[group];
+  const gid = group==='area'?'c-area':group==='ind'?'c-ind':'c-svc';
+  if(val===''){
+    set.clear();
+    document.querySelectorAll('#'+gid+' .chip').forEach(c=>{c.style.background='';c.style.color='';c.style.borderColor='';});
+  } else {
+    document.querySelector('#'+gid+' [data-val=""]').style.cssText='';
+    if(set.has(val)){
+      set.delete(val);
+      el.style.background=''; el.style.color=''; el.style.borderColor='';
+    } else {
+      set.add(val);
+      if(group==='area'&&AREA_COLORS[val]){
+        el.style.background=AREA_COLORS[val];
+        el.style.color=AREA_TEXT[val];
+        el.style.borderColor=AREA_COLORS[val];
+      } else {
+        el.style.background='#000'; el.style.color='#fff'; el.style.borderColor='#000';
+      }
+    }
+  }
+  openIdx=null; render();
+}
+
+const LOCK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E0004D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="No apto para RRSS"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+const PPT_I='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+const BLOG_I='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+
+function openLink(url){ window.open(url,'_blank'); }
+
+function render(){
+  const q=(document.getElementById('q')||{value:''}).value.toLowerCase();
+  const list=DATA.filter(d=>{
+    if(SEL.area.size&&!SEL.area.has(d.area))return false;
+    if(SEL.ind.size&&![...SEL.ind].some(v=>d.industria.toLowerCase().includes(v.toLowerCase())))return false;
+    if(SEL.svc.size&&![...SEL.svc].some(v=>d.servicio.toLowerCase().includes(v.toLowerCase())))return false;
+    if(q&&!d.nombre.toLowerCase().includes(q)&&!d.cliente.toLowerCase().includes(q)&&!d.industria.toLowerCase().includes(q))return false;
+    return true;
+  });
+  document.getElementById('count-lbl').textContent=list.length+(list.length===1?' caso':' casos');
+  const c=document.getElementById('cases');
+  if(!c) return;
+  if(!list.length){c.innerHTML='<div class="empty">Sin resultados.</div>';return;}
+  c.innerHTML=list.map((d,i)=>{
+    const open=openIdx===i;
+    const hB=d.blog&&d.blog.startsWith('http');
+    const hP=d.ppt&&d.ppt.startsWith('http');
+    return`<div class="case-card">
+      <div class="case-main" onclick="tog(${i})">
+        <div class="accent a-${d.area}"></div>
+        <div class="case-body">
+          <div class="case-client">${d.cliente.toUpperCase()}${d.privado?'&nbsp;'+LOCK:''}</div>
+          <div class="case-name">${d.nombre}</div>
+          <div class="tags">
+            <span class="tag t-${d.area}">${d.area}</span>
+            <span class="tag t-svc">${d.servicio}</span>
+          </div>
+        </div>
+        <div class="case-right">
+          ${hP?`<button class="btn-res btn-ppt" onclick="event.stopPropagation();openLink('${d.ppt}')">${PPT_I}One page</button>`:''}
+          ${hB?`<button class="btn-res" onclick="event.stopPropagation();openLink('${d.blog}')">${BLOG_I}Blog</button>`:''}
+          <div class="chev${open?' open':''}">${CHEV}</div>
+        </div>
+      </div>
+      <div class="case-detail${open?' open':''}">
+        <div class="detail-grid">
+          <div><div class="dl">Cliente</div><div class="dv">${d.cliente}</div></div>
+          <div><div class="dl">Servicio</div><div class="dv">${d.servicio}</div></div>
+          <div><div class="dl">Industria</div><div class="dv">${d.industria}</div></div>
+          <div><div class="dl">Publicación</div><div class="dv">${d.fecha||'—'}</div></div>
+        </div>
+        <div class="detail-links">
+          ${hP?`<button class="lnk lnk-ppt" onclick="openLink('${d.ppt}')">${PPT_I}Ver one page</button>`:''}
+          ${hB?`<button class="lnk" onclick="openLink('${d.blog}')">${BLOG_I}Ver artículo</button>`:''}
+          ${!hB&&!hP?'<span class="no-res-txt">Sin recursos disponibles aún.</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(i){openIdx=openIdx===i?null:i;render();}
+
+// Auto-load si ya está autenticado
+if(sessionStorage.getItem('mmg_auth')==='1') loadData();
+</script>
+</body>
+</html>
