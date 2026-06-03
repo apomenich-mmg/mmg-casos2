@@ -117,6 +117,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
     <div class="filter-block">
+      <span class="filter-label">Tipo</span>
+      <div class="chips" id="c-tipo">
+        <button class="chip" data-val="" data-group="tipo" onclick="toggleChip(this)">Todos</button>
+        <button class="chip" data-val="B2B" data-group="tipo" onclick="toggleChip(this)">B2B</button>
+        <button class="chip" data-val="B2C" data-group="tipo" onclick="toggleChip(this)">B2C</button>
+        <button class="chip" data-val="__empty__" data-group="tipo" onclick="toggleChip(this)">Sin datos</button>
+      </div>
+    </div>
+    <div class="filter-block">
+      <span class="filter-label">Privado</span>
+      <div class="chips" id="c-priv">
+        <button class="chip" data-val="" data-group="priv" onclick="toggleChip(this)">Todos</button>
+        <button class="chip" data-val="no" data-group="priv" onclick="toggleChip(this)">Solo públicos</button>
+        <button class="chip" data-val="si" data-group="priv" onclick="toggleChip(this)">Solo privados</button>
+        <button class="chip" data-val="__empty__" data-group="priv" onclick="toggleChip(this)">Sin respuesta</button>
+      </div>
+    </div>
+    <div class="filter-block">
       <span class="filter-label">Industria</span>
       <div class="chips" id="c-ind"></div>
     </div>
@@ -137,7 +155,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 <script>
 // ─── CONTRASEÑA ───────────────────────────────────────────────
-// Cambiá este valor por la contraseña que quieras
 const PASSWORD = 'mmg2024';
 
 function checkPwd(){
@@ -153,7 +170,6 @@ function checkPwd(){
   }
 }
 
-// Auto-login si ya autenticó en esta sesión
 if(sessionStorage.getItem('mmg_auth')==='1'){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('board').style.display='block';
@@ -207,12 +223,16 @@ function parseLine(line){
 
 // ─── DATA ─────────────────────────────────────────────────────
 let DATA = [];
-const SEL = {area:new Set(),ind:new Set(),svc:new Set()};
+const SEL = {area:new Set(), tipo:new Set(), priv:new Set(), ind:new Set(), svc:new Set()};
 let openIdx = null;
 
 const AREA_COLORS = {Metrix:'#307FE2',Forma:'#FE5000',Moov:'#E0004D',Vou:'#DCFE6F'};
 const AREA_TEXT   = {Metrix:'#fff',Forma:'#fff',Moov:'#fff',Vou:'#000'};
 const SVC_KEYWORDS = ['SEO','SEM','Analytics','CRO','Desarrollo Web','Audiovisual','CRM','Diseño','Influencer','RRSS','Planning','MELI','Social Listening'];
+
+function normalizeStr(s){
+  return s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+}
 
 async function loadData(){
   try{
@@ -228,16 +248,28 @@ async function loadData(){
         let ppt = (r['URL']||'').trim();
         if(ppt && !ppt.startsWith('http')) ppt = '';
 
-        // Artículo Blog — busca key que contenga 'blog' (tolera tilde)
-        const blogKey = Object.keys(r).find(k => k.normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().includes('blog'));
+        // Artículo Blog
+        const blogKey = Object.keys(r).find(k => k.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes('blog'));
         let blog = blogKey ? (r[blogKey]||'').trim() : '';
         if(['NA','N/A','na'].includes(blog) || (blog && !blog.startsWith('http'))) blog = '';
 
-        // PRIVADO — tolera SÍ con tilde
-        const privRaw = (r['PRIVADO']||'').trim().normalize('NFKD').replace(/[̀-ͯ]/g,'').toUpperCase();
-        const privado = privRaw === 'SI' || privRaw === 'TRUE';
+        // PRIVADO — 'si' | 'no' | '' (sin respuesta)
+        const privRaw = normalizeStr((r['PRIVADO']||'').trim());
+        let privado;
+        if(privRaw === 'SI' || privRaw === 'TRUE') privado = 'si';
+        else if(privRaw === 'NO' || privRaw === 'FALSE') privado = 'no';
+        else privado = ''; // sin respuesta
 
-        // Fecha — busca key que contenga 'fecha'
+        // B2B/B2C — normalizado a 'B2B' | 'B2C' | ''
+        const tipoKey = Object.keys(r).find(k => k.replace(/\//g,'').toLowerCase().includes('b2b') || k.replace(/\//g,'').toLowerCase().includes('b2c') || k.toLowerCase() === 'tipo');
+        const tipoRaw = tipoKey ? normalizeStr((r[tipoKey]||'').trim()) : '';
+        let tipo;
+        if(tipoRaw.includes('B2B') && tipoRaw.includes('B2C')) tipo = 'B2B/B2C';
+        else if(tipoRaw.includes('B2B')) tipo = 'B2B';
+        else if(tipoRaw.includes('B2C')) tipo = 'B2C';
+        else tipo = '';
+
+        // Fecha
         const fechaKey = Object.keys(r).find(k => k.toLowerCase().includes('fecha'));
         const fecha = fechaKey ? (r[fechaKey]||'').trim() : '';
 
@@ -247,11 +279,10 @@ async function loadData(){
           cliente:   (r['Cliente']||'').trim(),
           industria: (r['Industria']||'').trim(),
           nombre:    (r['Nombre del Caso']||'').trim(),
-          privado, fecha, blog, ppt
+          privado, tipo, fecha, blog, ppt
         };
       });
 
-    // Build dynamic filter chips
     buildChips();
     document.getElementById('filter-area').style.display='block';
     document.getElementById('cases-wrap').innerHTML='<div class="cases" id="cases"></div>';
@@ -265,7 +296,6 @@ async function loadData(){
 
 function buildChips(){
   const inds = [...new Set(DATA.map(d=>d.industria.split(',')[0].trim()).filter(Boolean))].sort();
-  const svcs = SVC_KEYWORDS;
 
   const indEl = document.getElementById('c-ind');
   indEl.innerHTML='<button class="chip" data-val="" data-group="ind" onclick="toggleChip(this)">Todas</button>';
@@ -278,7 +308,7 @@ function buildChips(){
 
   const svcEl = document.getElementById('c-svc');
   svcEl.innerHTML='<button class="chip" data-val="" data-group="svc" onclick="toggleChip(this)">Todos</button>';
-  svcs.forEach(s=>{
+  SVC_KEYWORDS.forEach(s=>{
     const b=document.createElement('button');
     b.className='chip'; b.dataset.val=s; b.dataset.group='svc';
     b.textContent=s; b.onclick=function(){toggleChip(this)};
@@ -288,18 +318,23 @@ function buildChips(){
 
 function toggleChip(el){
   const group=el.dataset.group, val=el.dataset.val, set=SEL[group];
-  const gid = group==='area'?'c-area':group==='ind'?'c-ind':'c-svc';
+  const gid = {area:'c-area',tipo:'c-tipo',priv:'c-priv',ind:'c-ind',svc:'c-svc'}[group];
+
   if(val===''){
+    // "Todos / Todas" → limpiar selección
     set.clear();
     document.querySelectorAll('#'+gid+' .chip').forEach(c=>{c.style.background='';c.style.color='';c.style.borderColor='';});
   } else {
-    document.querySelector('#'+gid+' [data-val=""]').style.cssText='';
+    // Deseleccionar chip "Todos"
+    const allChip = document.querySelector('#'+gid+' [data-val=""]');
+    if(allChip) allChip.style.cssText='';
+
     if(set.has(val)){
       set.delete(val);
       el.style.background=''; el.style.color=''; el.style.borderColor='';
     } else {
       set.add(val);
-      if(group==='area'&&AREA_COLORS[val]){
+      if(group==='area' && AREA_COLORS[val]){
         el.style.background=AREA_COLORS[val];
         el.style.color=AREA_TEXT[val];
         el.style.borderColor=AREA_COLORS[val];
@@ -321,29 +356,54 @@ function openLink(url){ window.open(url,'_blank'); }
 function render(){
   const q=(document.getElementById('q')||{value:''}).value.toLowerCase();
   const list=DATA.filter(d=>{
-    if(SEL.area.size&&!SEL.area.has(d.area))return false;
-    if(SEL.ind.size&&![...SEL.ind].some(v=>d.industria.toLowerCase().includes(v.toLowerCase())))return false;
-    if(SEL.svc.size&&![...SEL.svc].some(v=>d.servicio.toLowerCase().includes(v.toLowerCase())))return false;
-    if(q&&!d.nombre.toLowerCase().includes(q)&&!d.cliente.toLowerCase().includes(q)&&!d.industria.toLowerCase().includes(q))return false;
+    if(SEL.area.size && !SEL.area.has(d.area)) return false;
+
+    // Filtro tipo B2B/B2C
+    if(SEL.tipo.size){
+      const tipoVal = d.tipo || '';
+      const matchTipo = [...SEL.tipo].some(v => {
+        if(v === '__empty__') return tipoVal === '';
+        // Si el caso es B2B/B2C mixto, matchea tanto B2B como B2C
+        return tipoVal.includes(v);
+      });
+      if(!matchTipo) return false;
+    }
+
+    // Filtro privado
+    if(SEL.priv.size){
+      const matchPriv = [...SEL.priv].some(v => {
+        if(v === '__empty__') return d.privado === '';
+        return d.privado === v;
+      });
+      if(!matchPriv) return false;
+    }
+
+    if(SEL.ind.size && ![...SEL.ind].some(v=>d.industria.toLowerCase().includes(v.toLowerCase()))) return false;
+    if(SEL.svc.size && ![...SEL.svc].some(v=>d.servicio.toLowerCase().includes(v.toLowerCase()))) return false;
+    if(q && !d.nombre.toLowerCase().includes(q) && !d.cliente.toLowerCase().includes(q) && !d.industria.toLowerCase().includes(q)) return false;
     return true;
   });
+
   document.getElementById('count-lbl').textContent=list.length+(list.length===1?' caso':' casos');
   const c=document.getElementById('cases');
   if(!c) return;
   if(!list.length){c.innerHTML='<div class="empty">Sin resultados.</div>';return;}
+
   c.innerHTML=list.map((d,i)=>{
     const open=openIdx===i;
     const hB=d.blog&&d.blog.startsWith('http');
     const hP=d.ppt&&d.ppt.startsWith('http');
+    const tipoLabel = d.tipo ? `<span class="tag t-svc">${d.tipo}</span>` : '';
     return`<div class="case-card">
       <div class="case-main" onclick="tog(${i})">
         <div class="accent a-${d.area}"></div>
         <div class="case-body">
-          <div class="case-client">${d.cliente.toUpperCase()}${d.privado?'&nbsp;'+LOCK:''}</div>
+          <div class="case-client">${d.cliente.toUpperCase()}${d.privado==='si'?'&nbsp;'+LOCK:''}</div>
           <div class="case-name">${d.nombre}</div>
           <div class="tags">
             <span class="tag t-${d.area}">${d.area}</span>
             <span class="tag t-svc">${d.servicio}</span>
+            ${tipoLabel}
           </div>
         </div>
         <div class="case-right">
@@ -357,7 +417,9 @@ function render(){
           <div><div class="dl">Cliente</div><div class="dv">${d.cliente}</div></div>
           <div><div class="dl">Servicio</div><div class="dv">${d.servicio}</div></div>
           <div><div class="dl">Industria</div><div class="dv">${d.industria}</div></div>
+          <div><div class="dl">Tipo</div><div class="dv">${d.tipo||'—'}</div></div>
           <div><div class="dl">Publicación</div><div class="dv">${d.fecha||'—'}</div></div>
+          <div><div class="dl">Privado</div><div class="dv">${d.privado==='si'?'Sí':d.privado==='no'?'No':'—'}</div></div>
         </div>
         <div class="detail-links">
           ${hP?`<button class="lnk lnk-ppt" onclick="openLink('${d.ppt}')">${PPT_I}Ver one page</button>`:''}
@@ -371,7 +433,6 @@ function render(){
 
 function tog(i){openIdx=openIdx===i?null:i;render();}
 
-// Auto-load si ya está autenticado
 if(sessionStorage.getItem('mmg_auth')==='1') loadData();
 </script>
 </body>
