@@ -123,6 +123,20 @@ body{font-family:'Funnel Sans',sans-serif;background:var(--bg);color:var(--text)
 .dlnk{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid var(--border2);color:var(--text);background:var(--bg);cursor:pointer;transition:all 0.12s;font-family:'Funnel Sans',sans-serif}
 .dlnk:hover{background:var(--lima);border-color:var(--lima);color:#000}
 .no-res{font-size:11px;color:var(--text3)}
+
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+#modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;overflow:hidden;width:92vw;height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,0.22)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+.modal-title{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:0.07em;text-transform:uppercase;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-open-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:5px 12px;border-radius:7px;border:1px solid var(--border2);color:var(--text2);background:transparent;cursor:pointer;font-family:'Funnel Sans',sans-serif;white-space:nowrap;flex-shrink:0;transition:all 0.12s}
+.modal-open-btn:hover{background:var(--bg2)}
+.modal-close{width:30px;height:30px;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.12s}
+.modal-close:hover{background:var(--bg2)}
+.modal-iframe{flex:1;width:100%;border:none;background:var(--bg2)}
+.modal-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text2);pointer-events:none}
+.modal-frame-wrap{flex:1;position:relative;overflow:hidden}
 </style>
 </head>
 <body>
@@ -417,7 +431,7 @@ function render(){
     const tipoTag=d.tipo?`<span class="tag t-tipo">${d.tipo}</span>`:'';
     const privBadge=d.privado==='si'?LOCK:'';
     const footerLinks=(hP||hB)?`
-      ${hP?`<button class="res-link" onclick="event.stopPropagation();openLink('${d.ppt}')">${PPT_I}&nbsp;One page</button>`:''}
+      ${hP?`<button class="res-link" onclick="event.stopPropagation();openModal('${d.ppt}','${d.cliente}'">${PPT_I}&nbsp;One page</button>`:''}
       ${hP&&hB?'<div class="res-divider"></div>':''}
       ${hB?`<button class="res-link" onclick="event.stopPropagation();openLink('${d.blog}')">${BLOG_I}&nbsp;Blog</button>`:''}
     `:'';
@@ -449,7 +463,7 @@ function render(){
     <div><div class="dl">Privado</div><div class="dv">${d.privado==='si'?'Sí':d.privado==='no'?'No':'—'}</div></div>
   </div>
   <div class="detail-links">
-    ${hP?`<button class="dlnk" onclick="openLink('${d.ppt}')">${PPT_I}&nbsp;Ver one page</button>`:''}
+    ${hP?`<button class="dlnk" onclick="openModal('${d.ppt}','${d.cliente}')">${PPT_I}&nbsp;Ver one page</button>`:''}
     ${hB?`<button class="dlnk" onclick="openLink('${d.blog}')">${BLOG_I}&nbsp;Ver artículo</button>`:''}
     ${!hB&&!hP?'<span class="no-res">Sin recursos disponibles aún.</span>':''}
   </div>
@@ -461,6 +475,81 @@ function render(){
 function tog(i){openIdx=openIdx===i?null:i;render();}
 
 if(sessionStorage.getItem('mmg_auth')==='1') loadData();
+
+// ── MODAL ──────────────────────────────────────────────
+let _modalOrigUrl = '';
+
+function embedUrl(url) {
+  if (!url) return '';
+  // Google Slides: /presentation/d/ID/edit or /pub -> /embed
+  if (url.includes('docs.google.com/presentation')) {
+    // Already embed
+    if (url.includes('/embed')) return url;
+    // pub?
+    if (url.includes('/pub')) return url.replace('/pub', '/embed');
+    // edit or anything else -> strip query, add /embed
+    const base = url.split('/edit')[0].split('/pub')[0].split('/present')[0];
+    return base + '/embed?start=false&loop=false&delayms=0';
+  }
+  // Google Drive file (PDF etc): /file/d/ID/view -> /file/d/ID/preview
+  if (url.includes('drive.google.com/file')) {
+    return url.replace('/view', '/preview').replace('/edit', '/preview');
+  }
+  // Google Docs
+  if (url.includes('docs.google.com/document')) {
+    return url.replace('/edit', '/preview').replace('/pub', '/preview');
+  }
+  // Fallback: try as-is
+  return url;
+}
+
+function openModal(url, title) {
+  _modalOrigUrl = url;
+  const embed = embedUrl(url);
+  document.getElementById('modal-title').textContent = title || 'One page';
+  document.getElementById('modal-loading').style.display = 'flex';
+  document.getElementById('modal-iframe').src = embed;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-iframe').src = '';
+  document.body.style.overflow = '';
+}
+
+function openModalExternal() {
+  window.open(_modalOrigUrl, '_blank');
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModalDirect(); });
+
 </script>
+
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-open-btn" id="modal-ext-btn" onclick="openModalExternal()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Abrir en nueva pestaña
+      </button>
+      <button class="modal-close" onclick="closeModalDirect()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-frame-wrap">
+      <div class="modal-loading" id="modal-loading">Cargando…</div>
+      <iframe class="modal-iframe" id="modal-iframe" onload="document.getElementById('modal-loading').style.display='none'"></iframe>
+    </div>
+  </div>
+</div>
 </body>
 </html>
