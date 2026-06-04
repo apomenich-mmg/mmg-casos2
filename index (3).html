@@ -123,7 +123,6 @@ body{font-family:'Funnel Sans',sans-serif;background:var(--bg);color:var(--text)
 .dlnk{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:6px 13px;border-radius:7px;border:1px solid var(--border2);color:var(--text);background:var(--bg);cursor:pointer;transition:all 0.12s;font-family:'Funnel Sans',sans-serif}
 .dlnk:hover{background:var(--lima);border-color:var(--lima);color:#000}
 .no-res{font-size:11px;color:var(--text3)}
-
 </style>
 </head>
 <body>
@@ -462,23 +461,6 @@ function render(){
 function tog(i){openIdx=openIdx===i?null:i;render();}
 
 if(sessionStorage.getItem('mmg_auth')==='1') loadData();
-
-
-
 </script>
-      <button class="modal-open-btn" id="modal-ext-btn" onclick="openModalExternal()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Abrir en nueva pestaña
-      </button>
-      <button class="modal-close" onclick="closeModalDirect()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="modal-frame-wrap">
-      <div class="modal-loading" id="modal-loading">Cargando…</div>
-      <iframe class="modal-iframe" id="modal-iframe" onload="document.getElementById('modal-loading').style.display='none'"></iframe>
-    </div>
-  </div>
-</div>
 </body>
 </html>
